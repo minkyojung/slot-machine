@@ -220,6 +220,7 @@ export default function SlotMachine() {
             width={45}
             height={45}
             className="object-contain"
+            unoptimized
           />
         </motion.div>
       </div>
