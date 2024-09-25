@@ -46,6 +46,10 @@ export default function SlotMachine() {
   const audioRef2 = useRef<HTMLAudioElement | null>(null)
   const confettiButtonRef = useRef<HTMLButtonElement>(null)
 
+  const handleAudioEnd = () => {
+    // 오디오가 끝났을 때 수행할 동작을 여기에 작성하세요
+  };
+
   useEffect(() => {
     audioRef1.current = new Audio("https://hebbkx1anhila5yf.public.blob.vercel-storage.com/OK%20LETS%20GO-yzWb791Xi2QzL5X5di4x6ZUu87aLuT.mp3")
     audioRef2.current = new Audio("https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Slot%20Machine%20Jackpot%20Sound-SU1lpwzdgnOKxcZ0WkTNckb0R4rDYz.mp3")
