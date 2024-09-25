@@ -214,13 +214,12 @@ export default function SlotMachine() {
           animate={{ rotate: spinning ? 360 : 0 }}
           transition={{ duration: 0.5, repeat: spinning ? Infinity : 0, ease: "linear" }}
         >
-          <Image
+          <img
             src="/images/coin.png"
             alt="Aster Slot Coin"
             width={45}
             height={45}
             className="object-contain"
-            unoptimized
           />
         </motion.div>
       </div>
