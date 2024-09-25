@@ -3,13 +3,15 @@
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from 'next/image'
+import confetti from 'canvas-confetti'
+import { ConfettiButton } from "@/components/magicui/confetti"
 
 const allSymbols = [
-  { id: "heart", image: "/images/symbol.png" },
-  { id: "star", image: "/images/macbook.png" },
-  { id: "diamond", image: "/images/makers-club.png" },
-  { id: "club", image: "/images/coin.png" },
-  { id: "spade", image: "/images/upvote-99.png" }
+  { id: "symbol", image: "/images/symbol.png" },
+  { id: "macbook", image: "/images/macbook.png" },
+  { id: "makers-club", image: "/images/makers-club.png" },
+  { id: "ccb", image: "/images/ccb.png" },
+  { id: "upvote-99", image: "/images/upvote-99.png" }
 ]
 
 type Combination = [typeof allSymbols[0], typeof allSymbols[0], typeof allSymbols[0]]
@@ -36,11 +38,13 @@ const initialProbabilities = Object.fromEntries(
 
 export default function SlotMachine() {
   const [spinning, setSpinning] = useState(false)
-  // const [balance, setBalance] = useState(1000) // balance 변수를 주석 처리합니다
   const [visibleSymbols, setVisibleSymbols] = useState<Combination>([allSymbols[0], allSymbols[0], allSymbols[0]])
-  const [probabilities] = useState(initialProbabilities) // setProbabilities를 제거합니다
+  const [probabilities] = useState(initialProbabilities)
+  const [hasSpun, setHasSpun] = useState(false)  // 새로운 상태 변수
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false)
   const audioRef1 = useRef<HTMLAudioElement | null>(null)
   const audioRef2 = useRef<HTMLAudioElement | null>(null)
+  const confettiButtonRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     audioRef1.current = new Audio("https://hebbkx1anhila5yf.public.blob.vercel-storage.com/OK%20LETS%20GO-yzWb791Xi2QzL5X5di4x6ZUu87aLuT.mp3")
@@ -49,36 +53,55 @@ export default function SlotMachine() {
     if (audioRef1.current) audioRef1.current.volume = 0
     if (audioRef2.current) audioRef2.current.volume = 0.5
 
+    const handleAudioEnd = () => {
+      setIsAudioPlaying(false)
+    }
+
+    audioRef1.current?.addEventListener('ended', handleAudioEnd)
+    audioRef2.current?.addEventListener('ended', handleAudioEnd)
+
     return () => {
-      if (audioRef1.current) audioRef1.current.pause()
-      if (audioRef2.current) audioRef2.current.pause()
+      audioRef1.current?.removeEventListener('ended', handleAudioEnd)
+      audioRef2.current?.removeEventListener('ended', handleAudioEnd)
+      audioRef1.current?.pause()
+      audioRef2.current?.pause()
     }
   }, [])
 
-  const spin = () => {
-    if (spinning) return
-    setSpinning(true)
-
+  const playAudio = () => {
+    if (isAudioPlaying) {
+      audioRef1.current?.pause()
+      audioRef2.current?.pause()
+    }
+    
     if (audioRef1.current && audioRef2.current) {
       audioRef1.current.currentTime = 0
       audioRef2.current.currentTime = 0
       audioRef1.current.play()
       audioRef2.current.play()
-
-      setTimeout(() => {
-        audioRef1.current?.pause()
-        audioRef2.current?.pause()
-      }, 6500)
+      setIsAudioPlaying(true)
     }
+  }
 
-    // 확률에 따라 결과 선택
+  const spin = () => {
+    if (spinning) return
+    setSpinning(true)
+    setHasSpun(true)
+
+    playAudio()
+
     const result = selectResultBasedOnProbability()
     
-    // 애니메이션을 위한 임시 상태 변경
     const spinTimes = [3000, 4500, 5000]
     spinTimes.forEach((time, index) => {
       spinReel(index, time, result[index])
     })
+
+    // 모든 릴이 멈춘 후 결과 확인
+    setTimeout(() => {
+      checkWin(result)
+      setSpinning(false)
+    }, Math.max(...spinTimes) + 100)
   }
 
   const selectResultBasedOnProbability = (): Combination => {
@@ -120,16 +143,63 @@ export default function SlotMachine() {
         })
         if (reelIndex === 2) {
           setSpinning(false)
-          checkWin()
         }
       }
     }, intervalTime)
   }
 
-  const checkWin = () => {
-    if (visibleSymbols[0].id === visibleSymbols[1].id && visibleSymbols[1].id === visibleSymbols[2].id) {
-      // setBalance(balance => balance + 100) // 이 줄을 주석 처리합니다
-      console.log("You won!") // 대신 콘솔에 메시지를 출력합니다
+  const triggerConfetti = () => {
+    const end = Date.now() + 3 * 1000; // 3초 동안 실행
+    const colors = ["#a786ff", "#fd8bbc", "#eca184", "#f8deb1"];
+
+    const frame = () => {
+      if (Date.now() > end) return;
+
+      confetti({
+        particleCount: 20, // 파티클 수 증가
+        angle: 60,
+        spread: 55,
+        startVelocity: 60,
+        origin: { x: 0, y: 0.5 },
+        colors: colors,
+      });
+      confetti({
+        particleCount: 20, // 파티클 수 증가
+        angle: 120,
+        spread: 55,
+        startVelocity: 60,
+        origin: { x: 1, y: 0.5 },
+        colors: colors,
+      });
+
+      requestAnimationFrame(frame);
+    };
+
+    frame();
+  }
+
+  const triggerSimpleConfetti = () => {
+    confetti({
+      particleCount: 50,
+      spread: 60,
+      origin: { y: 0.6 }
+    });
+  }
+
+  const checkWin = (result: Combination) => {
+    if (!hasSpun) return
+
+    console.log("Final symbols:", result.map(s => s.id).join(','))
+    if (result[0].id === result[1].id && result[1].id === result[2].id) {
+      console.log("Jackpot! You won!")
+      triggerConfetti()
+    } else if (
+      result[0].id === result[1].id ||
+      result[1].id === result[2].id ||
+      result[0].id === result[2].id
+    ) {
+      console.log("Two matching symbols! Small win!")
+      triggerSimpleConfetti()
     }
   }
 
@@ -143,7 +213,20 @@ export default function SlotMachine() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#000000] text-white font-sans">
-      <div className="mb-16 text-4xl font-semibold">Aster Slot</div>
+      <div className="mb-16">
+        <motion.div
+          animate={{ rotate: spinning ? 360 : 0 }}
+          transition={{ duration: 0.5, repeat: spinning ? Infinity : 0, ease: "linear" }}
+        >
+          <Image
+            src="/images/coin.png"
+            alt="Aster Slot Coin"
+            width={45}
+            height={45}
+            className="object-contain"
+          />
+        </motion.div>
+      </div>
       <div className="flex space-x-8 mb-16">
         {visibleSymbols.map((symbol, index) => (
           <div
@@ -177,6 +260,9 @@ export default function SlotMachine() {
       >
         {spinning ? "Spinning..." : "Spin"}
       </button>
+      <div className="hidden">
+        <ConfettiButton ref={confettiButtonRef}>Hidden Confetti</ConfettiButton>
+      </div>
     </div>
   )
 }
