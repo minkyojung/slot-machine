@@ -7,11 +7,11 @@ import confetti from 'canvas-confetti'
 import { ConfettiButton } from "@/components/magicui/confetti"
 
 const allSymbols = [
-  { id: "symbol", image: "/symbol.png" },
-  { id: "macbook", image: "/macbook.png" },
-  { id: "makers-club", image: "/makers-club.png" },
-  { id: "ccb", image: "/ccb.png" },
-  { id: "upvote-99", image: "/upvote-99.png" }
+  { id: "symbol", image: "/images/symbol.png" },
+  { id: "macbook", image: "/images/macbook.png" },
+  { id: "makers-club", image: "/images/makers-club.png" },
+  { id: "ccb", image: "/images/ccb.png" },
+  { id: "upvote-99", image: "/images/upvote-99.png" }
 ]
 
 type Combination = [typeof allSymbols[0], typeof allSymbols[0], typeof allSymbols[0]]
