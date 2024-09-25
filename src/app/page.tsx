@@ -31,14 +31,14 @@ const allCombinations = generateAllCombinations()
 
 // 초기 확률 설정 (모든 조합에 대해 동일한 확률)
 const initialProbabilities = Object.fromEntries(
-  allCombinations.map((combo, index) => [`${combo[0].id},${combo[1].id},${combo[2].id}`, 1 / allCombinations.length])
+  allCombinations.map((combo) => [`${combo[0].id},${combo[1].id},${combo[2].id}`, 1 / allCombinations.length])
 )
 
 export default function SlotMachine() {
   const [spinning, setSpinning] = useState(false)
-  const [balance, setBalance] = useState(1000)
+  // const [balance, setBalance] = useState(1000) // balance 변수를 주석 처리합니다
   const [visibleSymbols, setVisibleSymbols] = useState<Combination>([allSymbols[0], allSymbols[0], allSymbols[0]])
-  const [probabilities, setProbabilities] = useState(initialProbabilities)
+  const [probabilities] = useState(initialProbabilities) // setProbabilities를 제거합니다
   const audioRef1 = useRef<HTMLAudioElement | null>(null)
   const audioRef2 = useRef<HTMLAudioElement | null>(null)
 
@@ -128,15 +128,18 @@ export default function SlotMachine() {
 
   const checkWin = () => {
     if (visibleSymbols[0].id === visibleSymbols[1].id && visibleSymbols[1].id === visibleSymbols[2].id) {
-      setBalance(balance => balance + 100)
+      // setBalance(balance => balance + 100) // 이 줄을 주석 처리합니다
+      console.log("You won!") // 대신 콘솔에 메시지를 출력합니다
     }
   }
 
-  // 확률 조정 함수 (실제 UI는 구현하지 않았습니다)
+  // adjustProbability 함수를 주석 처리합니다
+  /*
   const adjustProbability = (combination: Combination, newProbability: number) => {
     const key = combination.map(s => s.id).join(',')
     setProbabilities(prev => ({...prev, [key]: newProbability}))
   }
+  */
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#000000] text-white font-sans">
