@@ -247,6 +247,7 @@ export default function SlotMachine() {
                   width={200}
                   height={200}
                   className="object-contain"
+                  unoptimized // 이 속성을 추가합니다.
                 />
               </motion.div>
             </AnimatePresence>
