@@ -10,7 +10,7 @@ const allSymbols = [
   { id: "symbol", image: "/images/symbol.png" },
   { id: "macbook", image: "/images/macbook.png" },
   { id: "makers-club", image: "/images/makers-club.png" },
-  { id: "ccb", image: "/images/ccb.png" }
+  { id: "ccb", image: "/images/ccb1.png" }
 ]
 
 type Combination = [typeof allSymbols[0], typeof allSymbols[0], typeof allSymbols[0]]
