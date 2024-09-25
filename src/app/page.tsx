@@ -47,7 +47,7 @@ export default function SlotMachine() {
     audioRef2.current = new Audio("https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Slot%20Machine%20Jackpot%20Sound-SU1lpwzdgnOKxcZ0WkTNckb0R4rDYz.mp3")
 
     if (audioRef1.current) audioRef1.current.volume = 0
-    if (audioRef2.current) audioRef2.current.volume = 0.5
+    if (audioRef2.current) audioRef2.current.volume = 0.6
 
     return () => {
       if (audioRef1.current) audioRef1.current.pause()
