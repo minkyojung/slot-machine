@@ -38,7 +38,7 @@ const initialProbabilities = Object.fromEntries(
 export default function SlotMachine() {
   const [spinning, setSpinning] = useState(false)
   const [visibleSymbols, setVisibleSymbols] = useState<Combination>([allSymbols[0], allSymbols[0], allSymbols[0]])
-  const [probabilities] = useState(initialProbabilities)
+  const [probabilities, setProbabilities] = useState(initialProbabilities)
   const [hasSpun, setHasSpun] = useState(false)  // 새로운 상태 변수
   const [isAudioPlaying, setIsAudioPlaying] = useState(false)
   const audioRef1 = useRef<HTMLAudioElement | null>(null)
@@ -54,7 +54,7 @@ export default function SlotMachine() {
     audioRef2.current = new Audio("https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Slot%20Machine%20Jackpot%20Sound-SU1lpwzdgnOKxcZ0WkTNckb0R4rDYz.mp3")
 
     if (audioRef1.current) audioRef1.current.volume = 0
-    if (audioRef2.current) audioRef2.current.volume = 0.6
+    if (audioRef2.current) audioRef2.current.volume = 0.5
 
     return () => {
       audioRef1.current?.removeEventListener('ended', handleAudioEnd)
@@ -79,10 +79,53 @@ export default function SlotMachine() {
     }
   }
 
+  // 새로운 함수: 확률 설정
+  const setCustomProbabilities = () => {
+    const newProbabilities = { ...initialProbabilities }
+    let totalProb = 0
+
+    // 3개 일치 확률 (예: 10%)
+    const threeMatchProb = 0.25
+    for (const combo of allCombinations) {
+      if (combo[0].id === combo[1].id && combo[1].id === combo[2].id) {
+        const key = `${combo[0].id},${combo[1].id},${combo[2].id}`
+        newProbabilities[key] = threeMatchProb / 4 // 4가지 심볼에 대해 균등하게 분배
+        totalProb += newProbabilities[key]
+      }
+    }
+
+    // 2개 일치 확률 (예: 30%)
+    const twoMatchProb = 0.35
+    for (const combo of allCombinations) {
+      if ((combo[0].id === combo[1].id && combo[1].id !== combo[2].id) ||
+          (combo[0].id === combo[2].id && combo[1].id !== combo[2].id) ||
+          (combo[1].id === combo[2].id && combo[0].id !== combo[1].id)) {
+        const key = `${combo[0].id},${combo[1].id},${combo[2].id}`
+        newProbabilities[key] = twoMatchProb / 36 // 2개 일치 조합의 수는 36개
+        totalProb += newProbabilities[key]
+      }
+    }
+
+    // 나머지 확률을 1개 일치(모두 다른 경우)에 할당
+    const remainingProb = 1 - totalProb
+    const oneMatchCombos = allCombinations.filter(combo => 
+      combo[0].id !== combo[1].id && combo[1].id !== combo[2].id && combo[0].id !== combo[2].id
+    )
+    for (const combo of oneMatchCombos) {
+      const key = `${combo[0].id},${combo[1].id},${combo[2].id}`
+      newProbabilities[key] = remainingProb / oneMatchCombos.length
+    }
+
+    setProbabilities(newProbabilities)
+  }
+
   const spin = () => {
     if (spinning) return
     setSpinning(true)
     setHasSpun(true)
+
+    // 스핀할 때마다 확률 재설정
+    setCustomProbabilities()
 
     playAudio()
 
@@ -198,14 +241,6 @@ export default function SlotMachine() {
       triggerSimpleConfetti()
     }
   }
-
-  // adjustProbability 함수를 주석 처리합니다
-  /*
-  const adjustProbability = (combination: Combination, newProbability: number) => {
-    const key = combination.map(s => s.id).join(',')
-    setProbabilities(prev => ({...prev, [key]: newProbability}))
-  }
-  */
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#000000] text-white font-sans">
