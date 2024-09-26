@@ -239,6 +239,8 @@ export default function SlotMachine() {
     ) {
       console.log("Two matching symbols! Small win!")
       triggerSimpleConfetti()
+    } else {
+      console.log("No match. Try again!")
     }
   }
 
