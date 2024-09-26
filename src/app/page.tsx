@@ -215,7 +215,7 @@ export default function SlotMachine() {
           transition={{ duration: 0.5, repeat: spinning ? Infinity : 0, ease: "linear" }}
         >
           <img
-            src="/images/coin.png"
+            src="/images/coinn.png"
             alt="Aster Slot Coin"
             width={45}
             height={45}
