@@ -85,7 +85,7 @@ export default function SlotMachine() {
     let totalProb = 0
 
     // 3개 일치 확률 (예: 10%)
-    const threeMatchProb = 0.25
+    const threeMatchProb = 0.55
     for (const combo of allCombinations) {
       if (combo[0].id === combo[1].id && combo[1].id === combo[2].id) {
         const key = `${combo[0].id},${combo[1].id},${combo[2].id}`
@@ -95,7 +95,7 @@ export default function SlotMachine() {
     }
 
     // 2개 일치 확률 (예: 30%)
-    const twoMatchProb = 0.35
+    const twoMatchProb = 0.3
     for (const combo of allCombinations) {
       if ((combo[0].id === combo[1].id && combo[1].id !== combo[2].id) ||
           (combo[0].id === combo[2].id && combo[1].id !== combo[2].id) ||
